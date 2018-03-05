@@ -44,6 +44,18 @@ describe('Auth Routes', function(){
           });
       });
     });
+
+    describe('with an invalid body', function(){
+      it('should return a 400 error', done => {
+        request.post(`${url}/api/signup`)
+          .send({})
+          .end((err, res) => {
+            expect(err.status).toEqual(400);
+            expect(res.status).toEqual(400);
+            done();
+          });
+      });
+    });
   });
 
   describe('GET: /api/signin', function(){
@@ -72,6 +84,18 @@ describe('Auth Routes', function(){
             if(err) return done(err);
             expect(res.status).toEqual(200);
             expect(typeof res.text).toEqual('string');
+            done();
+          });
+      });
+    });
+
+    describe('with inauthentic credentials', function(){
+      it('should return a 401 error', done => {
+        request.get(`${url}/api/signin`)
+          .auth('exampleuser', '5678')
+          .end((err, res) => {
+            expect(err.status).toEqual(401);
+            expect(res.status).toEqual(401);
             done();
           });
       });
