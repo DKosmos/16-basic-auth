@@ -9,6 +9,7 @@ const morgan = require('morgan');
 
 const authRouter = require('./route/auth-router.js');
 const photoAlbumRouter = require('./route/photoalbum-router.js');
+const photoRouter = require('./route/photo-router.js');
 const errors = require('./lib/error-middleware');
 
 dotenv.load();
@@ -22,6 +23,7 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(authRouter);
 app.use(photoAlbumRouter);
+app.use(photoRouter);
 
 
 app.use(errors);
