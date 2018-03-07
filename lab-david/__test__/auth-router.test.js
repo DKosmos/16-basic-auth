@@ -1,8 +1,6 @@
 'use strict';
 
 const request = require('superagent');
-// const mongoose = require('mongoose');
-// const Promise = require('bluebird');
 const User = require('../model/user.js');
 const serverToggle = require('../lib/server-toggle.js');
 const server = require('../server.js');
@@ -46,7 +44,7 @@ describe('Auth Routes', function(){
     });
 
     describe('with an invalid body', function(){
-      it.only('should return a 400 error', done => {
+      it('should return a 400 error', done => {
         request.post(`${url}/api/signup`)
           .send({})
           .end((err, res) => {

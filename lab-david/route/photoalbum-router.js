@@ -36,7 +36,7 @@ photoAlbumRouter.get('/api/photoalbum/:photoalbumId', bearerAuth, jsonParser, (r
 
 photoAlbumRouter.put('/api/photoalbum/:photoalbumId', bearerAuth, jsonParser, (req, res, next) => {
   debug('PUT: /api/photoalbum/:photoalbumId');
-
+  console.log('req.body', req.body);
   if(!req.body) return next(createError(400, 'invalid body'));
 
   PhotoAlbum.findByIdAndUpdate(req.params.photoalbumId, req.body, {new:true})
