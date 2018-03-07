@@ -13,10 +13,14 @@ const photoAlbumRouter = module.exports = Router();
 photoAlbumRouter.post('/api/photoalbum', bearerAuth, jsonParser, (req, res, next) => {
   debug('POST: /api/photoalbum');
 
+
   req.body.userId = req.user._id;
   new PhotoAlbum(req.body).save()
     .then( photoAlbum => res.json(photoAlbum))
-    .catch(next);
+    .catch(err => {
+      err = createError(404, err.message);
+      next(err);
+    });
 });
 
 photoAlbumRouter.get('/api/photoalbum/:photoalbumId', bearerAuth, jsonParser, (req, res, next) => {

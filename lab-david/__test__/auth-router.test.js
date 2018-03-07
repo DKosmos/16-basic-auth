@@ -46,7 +46,7 @@ describe('Auth Routes', function(){
     });
 
     describe('with an invalid body', function(){
-      it('should return a 400 error', done => {
+      it.only('should return a 400 error', done => {
         request.post(`${url}/api/signup`)
           .send({})
           .end((err, res) => {
