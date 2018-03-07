@@ -7,13 +7,16 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "DEBUG='cfgram*' jest",
+    "test": "DEBUG='cfgram*' jest -i",
     "lint": "DEBUG='cfgram*' eslint",
     "start": "DEBUG='cfgram*' node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "jest": {
+    "testEnvironment": "node"
+  },
   "dependencies": {
     "bcrypt": "^1.0.3",
     "bluebird": "^3.5.1",

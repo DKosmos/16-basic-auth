@@ -24,6 +24,7 @@ exports.serverOff = function(server, done){
       server.isRunning = false;
       mongoose.connection.close();
       debug('server down!');
+      done();
     });
     return;
   }
