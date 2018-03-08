@@ -19,3 +19,8 @@
 - `GET: /api/photoalbum/:photoalbumId` returns photo album with associated photoalbumId.
 - `PUT: /api/photoalbum/:photoalbumId { name, desc }` updates photo album associated with photoalbumId with provided key: values.
 - `DELETE: /api/photoalbum/:photoalbumId` deletes photo album associated with photoalbumId
+
+### Photo
+
+- `POST: /api/photoalbum/:photoalbumId/photo` creates a new photo within album associated with photoalbumId and saves photo to AWS S3.
+- `DELETE: /api/photo/:photoId` deletes photo associated with photoId from AWS S3 and MongoDB.
