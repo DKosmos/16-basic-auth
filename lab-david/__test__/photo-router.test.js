@@ -41,7 +41,31 @@ describe('Photo Router', function(){
     serverToggle.serverOff(server, done);
   });
 
-  afterEach( done => {
+  beforeAll( done => {
+    new User(exampleUser)
+      .generatePasswordHash(exampleUser.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUser = user;
+        return user.generateToken();
+      }).then( token => {
+        this.tempToken = token;
+        done();
+      }).catch(done);
+  });
+
+  beforeAll( done => {
+    examplePhotoAlbum.userId = this.tempUser._id.toString();
+    new PhotoAlbum(examplePhotoAlbum).save()
+      .then( album => {
+        this.tempAlbum = album;
+        done();
+      });
+  });
+
+  this.tempPhoto = {};
+
+  afterAll( done => {
     Promise.all([
       Photo.remove({}),
       User.remove({}),
@@ -51,20 +75,8 @@ describe('Photo Router', function(){
       .catch(done);
   });
 
-  describe('POST: /api/photoalbum/:photoalbumId/photo', function(){
-    describe('with a valid token and valid data', function(){
-      beforeEach( done => {
-        new User(exampleUser)
-          .generatePasswordHash(exampleUser.password)
-          .then( user => user.save())
-          .then( user => {
-            this.tempUser = user;
-            return user.generateToken();
-          }).then( token => {
-            this.tempToken = token;
-            done();
-          }).catch(done);
-      });
+  describe('POST: /api/photoalbum/:photoalbumId/photo', () => {
+    describe('with a valid token and valid data', () => {
 
       beforeEach( done => {
         fs.copyFileProm(`${__dirname}/../tester.png`, `${__dirname}/../data/tester.png`)
@@ -72,14 +84,6 @@ describe('Photo Router', function(){
           .catch(done);
       });
 
-      beforeEach( done => {
-        examplePhotoAlbum.userId = this.tempUser._id.toString();
-        new PhotoAlbum(examplePhotoAlbum).save()
-          .then( album => {
-            this.tempAlbum = album;
-            done();
-          });
-      });
 
       afterEach( done => {
         delete examplePhotoAlbum.userId;
@@ -96,11 +100,28 @@ describe('Photo Router', function(){
           .attach('image', examplePhoto.image)
           .end((err, res) => {
             if(err) return done(err);
-            console.log('res.body', res.body);
+            this.tempPhoto = res.body;
             expect(res.status).toEqual(200);
             expect(res.body.name).toEqual(examplePhoto.name);
             expect(res.body.desc).toEqual(examplePhoto.desc);
             expect(res.body.photoAlbumId).toEqual(this.tempAlbum._id.toString());
+            done();
+          });
+      });
+    });
+  });
+
+  describe('DELETE: /api/photo/:photoId', () => {
+    describe('with a valid id', () => {
+
+      it('should return status 204', done => {
+        request.delete(`${url}/api/photo/${this.tempPhoto._id}`)
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            if(err) return done(err);
+            expect(res.status).toEqual(204);
             done();
           });
       });

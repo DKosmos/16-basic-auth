@@ -31,10 +31,19 @@ function s3uploadProm(params){
   });
 }
 
+function s3deleteProm(params){
+  debug('s3deleteProm');
+
+  return new Promise((resolve, reject) => {
+    s3.deleteObject(params, (err, s3res) => {
+      resolve(s3res);
+    });
+  });
+}
+
 photoRouter.post('/api/photoalbum/:photoalbumId/photo', bearerAuth, upload.single('image'), function(req, res, next){
   debug('POST: /api/photoalbum/:photoalbumId/photo');
   
-  console.log('req.file', req.file);
   if(!req.file) return next(createError(400, 'file not found'));
   if(!req.file.path) return next(createError(500, 'file not saved'));
 
@@ -50,7 +59,6 @@ photoRouter.post('/api/photoalbum/:photoalbumId/photo', bearerAuth, upload.singl
   PhotoAlbum.findById(req.params.photoalbumId)
     .then( () => s3uploadProm(params))
     .then( s3data => {
-      console.log('s3data', s3data);
       del([`${dataDir}/*`]);
 
       let photoData = {
@@ -65,5 +73,27 @@ photoRouter.post('/api/photoalbum/:photoalbumId/photo', bearerAuth, upload.singl
       return new Photo(photoData).save();
     })
     .then( photo => res.json(photo))
+    .catch(err => next(err));
+});
+
+photoRouter.delete('/api/photo/:photoId', bearerAuth, function(req, res, next){
+  debug('DELETE: /api/photo/:photoId');
+
+  if(!req.params.photoId) return next(createError(400, 'bad request'));
+  
+  var params = {
+    Bucket: process.env.AWS_BUCKET,
+    Key: '',
+  };
+  
+  Photo.findById(req.params.photoId)
+    .then( photo => {
+      params.Key = photo.objectKey;
+      return s3deleteProm(params);
+    })
+    .then( () => {
+      return Photo.findByIdAndRemove(req.params.photoId);
+    })
+    .then( () => res.status(204).send())
     .catch(err => next(err));
 });
